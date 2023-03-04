@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,6 +12,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class InputOutputTest {
+	
+	int offset = 5;
 
 	String fileName = "myFile";
 //	String directoryName = "myDirectory1";
@@ -38,43 +39,42 @@ class InputOutputTest {
 	}
 
 	@Test
-	@Disabled
+//	@Disabled
 	void printDirectoryFileTest() {
-		String path = "D:\\eclipse-workspace";
-		int maxLevel = 3;
-		File root = new File(path);
-		System.out.println("directory: " + root.getName());
-		int offset = 5;
-		int currentLvl = 0;
-		printDirectoryFile(path, maxLevel, currentLvl, offset);
+
+		printDirectoryFile("D:\\eclipse-workspace", 3);
 	}
 
-	void printDirectoryFile(String path, int maxLevel, int currentLvl, int offset) {
-		if (currentLvl == maxLevel) {
-			return;
+	void printDirectoryFile(String path, int maxLevel) {		
+		if (maxLevel < 1) {
+			maxLevel = Integer.MAX_VALUE;
+		}		
+		File root = new File(path);	
+		int depth = root.toPath().toAbsolutePath().getNameCount();
+		printName(depth, root);
+		filePrintTree(maxLevel, root, depth);
+	}
+
+	private void filePrintTree(int maxLevel, File root, int depth) {
+		if (depth > maxLevel) {
+			return;		
 		}
-		File root = new File(path);
-		String[] dirContant = root.list();
-		int index = 0;
-		while (index < dirContant.length) {
-			String curPath = path + "\\" + dirContant[index];
-			File current = new File(curPath);
-			if (current.isDirectory()) {
-				System.out.print(" ".repeat(offset));
-				System.out.println("directory: " + current.getName());
-				if (maxLevel < 1) {
-					printDirectoryFile(curPath, maxLevel, currentLvl, offset + 5);
-				} else {
-					printDirectoryFile(curPath, maxLevel, currentLvl + 1, offset + 5);
-				}
+		File[] dirContant = root.listFiles();
+		for (int i = 0; i < dirContant.length; i++) {			
+			File current = dirContant[i];
+			depth = current.toPath().toAbsolutePath().getNameCount();
+			if (current.isDirectory()) {				
+				printName(depth, current);	
+				filePrintTree(maxLevel, current, depth);
 			} else {
-				System.out.print(" ".repeat(offset));
-				System.out.println("file name: " + current.getName());
+				printName(depth, current);
 			}
-			index++;
 		}
+	}
 
-
+	private void printName(int depth, File current) {
+		System.out.print(" ".repeat(offset * depth));
+		System.out.printf("%s%s\n", current.isDirectory() ? "directory: " : "file name: ", current.getName());
 	}
 
 	@Test
@@ -86,32 +86,24 @@ class InputOutputTest {
 
 	
 	@Test
-//	@Disabled
+	@Disabled
 	void printDirectoryFilesTest() throws IOException {
-		String path = "D:\\eclipse-workspace";
-		int maxLevel = 3;	
-		int offset = 5;
-		printDirectoryFiles(path, maxLevel, offset);
+		
+		printDirectoryFiles("D:\\eclipse-workspace", 3);
 	}
 
-	void printDirectoryFiles(String path, int maxLevel, int offset) throws IOException {
+	void printDirectoryFiles(String path, int maxLevel) throws IOException {
 		if (maxLevel < 1) {
 			maxLevel = Integer.MAX_VALUE;
 		}
 		Path root = Paths.get(path);
-		Files.walk(root, maxLevel).forEach(x -> printTree(x.toString(), offset));		
+		Files.walk(root, maxLevel).forEach(x -> filesPrintTree(x.toString()));		
 	}
 
-	private void printTree(String path, int offset) {
+	private void filesPrintTree(String path) {
 		File current = new File(path);
-		int depth = current.toPath().toAbsolutePath().getNameCount();
-		if (current.isDirectory()) {
-			System.out.print(" ".repeat(offset * depth));
-			System.out.println("directory: " + current.getName());
-		} else {
-			System.out.print(" ".repeat(offset * depth));
-			System.out.println("file name: " + current.getName());
-		}
+		int depth = current.toPath().toAbsolutePath().getNameCount();		
+		printName(depth, current);
 	}
 
 }
