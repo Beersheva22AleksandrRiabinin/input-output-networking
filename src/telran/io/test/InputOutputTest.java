@@ -97,13 +97,12 @@ class InputOutputTest {
 			maxLevel = Integer.MAX_VALUE;
 		}
 		Path root = Paths.get(path);
-		Files.walk(root, maxLevel).forEach(x -> filesPrintTree(x.toString()));		
+		Files.walk(root, maxLevel).forEach(p -> filesPrintTree(p));		
 	}
 
-	private void filesPrintTree(String path) {
-		File current = new File(path);
-		int depth = current.toPath().toAbsolutePath().getNameCount();		
-		printName(depth, current);
+	private void filesPrintTree(Path path) {
+		int depth = path.toAbsolutePath().getNameCount();		
+		printName(depth, path.toFile());
 	}
 
 }
