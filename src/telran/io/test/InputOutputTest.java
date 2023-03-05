@@ -60,8 +60,8 @@ class InputOutputTest {
 			return;		
 		}
 		File[] dirContant = root.listFiles();
-		for (int i = 0; i < dirContant.length; i++) {			
-			File current = dirContant[i];
+		for (File file : dirContant) {			
+			File current = file;
 			depth = current.toPath().toAbsolutePath().getNameCount();
 			if (current.isDirectory()) {				
 				printName(depth, current);	
